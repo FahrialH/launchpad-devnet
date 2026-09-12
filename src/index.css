@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#090d16] text-slate-100 antialiased font-sans;
+  }
+}
+
+/* Solana Wallet Modal Styling Overrides for dark launchpad theme */
+.wallet-adapter-modal-wrapper {
+  background-color: #0d1322 !important;
+  border: 1px solid #1e293d !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+  color: #f8fafc !important;
+}
+
+.wallet-adapter-modal-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.wallet-adapter-button {
+  border-radius: 0.75rem !important;
+  font-family: inherit !important;
+}
+
+.wallet-adapter-button-trigger {
+  background-color: #9945FF !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background-color: #1e293b !important;
+}

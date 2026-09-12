@@ -1,0 +1,6 @@
+# robots.txt for https://launchpad.idopentech.com
+User-agent: *
+Allow: /
+
+# Sitemap Location
+Sitemap: https://launchpad.idopentech.com/sitemap.xml
