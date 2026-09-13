@@ -17,6 +17,7 @@ This document provides automated workspace context for AI coding engines (**Anti
 - `dist/`
 - `src/`
 - `supabase/`
+- `vercel.json` — Vercel SPA fallback for direct route loads
 
 ---
 
