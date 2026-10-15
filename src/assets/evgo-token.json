@@ -2,7 +2,7 @@
   "name": "EV-GO",
   "symbol": "EVGO",
   "description": "EV-GO is part of the ID-OPENTECH ecosystem, connecting electric mobility, sustainable transportation, and blockchain technology. The project aims to support a greener mobility ecosystem through Web3 integration and digital rewards.",
-  "image": "https://example.com/evgo-token.png",
+  "image": "https://raw.githubusercontent.com/FahrialH/launchpad-devnet/refs/heads/main/src/assets/evgo-token-v3.png",
   "external_url": "https://ev-go.id",
   "attributes": [
     {
@@ -25,7 +25,7 @@
   "properties": {
     "files": [
       {
-        "uri": "https://example.com/evgo-token.png",
+        "uri": "https://raw.githubusercontent.com/FahrialH/launchpad-devnet/refs/heads/main/src/assets/evgo-token-v3.png",
         "type": "image/png"
       }
     ],
