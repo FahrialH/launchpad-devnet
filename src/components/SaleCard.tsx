@@ -1,10 +1,10 @@
 import React from 'react';
-import { TokenConfig, EligibilityStatus, RegistrationResponse } from '../types';
+import { TokenConfig, EligibilityStatus } from '../types';
 import { SaleStatus } from './SaleStatus';
 import { Countdown } from './Countdown';
 import { SaleMetrics } from './SaleMetrics';
 import { EligibilityCard } from './EligibilityCard';
-import { ParticipantForm } from './ParticipantForm';
+import { BuyTokenForm } from './BuyTokenForm';
 import { Lock } from 'lucide-react';
 import { useSolPrice } from '../hooks/useSolPrice';
 
@@ -16,8 +16,8 @@ interface SaleCardProps {
   eligibilityStatus: EligibilityStatus;
   refreshBalance: () => void;
   setBalanceSol: (val: number) => void;
-  onSuccess: (res: RegistrationResponse, formData: { email: string; telegramId: string; walletAddress: string; fullName: string; commitAmount: number; commitCurrency: string }) => void;
-  onError: (msg: string) => void;
+  onSuccess?: (txSig: string, amount: number) => void;
+  onError?: (msg: string) => void;
 }
 
 export const SaleCard: React.FC<SaleCardProps> = ({
@@ -29,20 +29,17 @@ export const SaleCard: React.FC<SaleCardProps> = ({
   refreshBalance,
   setBalanceSol,
   onSuccess,
-  onError,
 }) => {
   const { sale } = token;
 
   // Determine timer label & target date
   const isUpcoming = sale.status === 'upcoming';
-  const isLive = sale.status === 'live';
   const isEnded = sale.status === 'ended';
 
   const countdownTarget = isUpcoming ? sale.startAt : sale.endAt;
-  const countdownLabel = isUpcoming ? 'Sale Starts In' : isLive ? 'Sale Ends In' : 'Sale Status';
+  const countdownLabel = isUpcoming ? 'Sale Starts In' : !isEnded ? 'Sale Ends In' : 'Sale Status';
 
-  // Single SOL price source for entire card — sharing prevents form unmount/remount
-  // and ensures SaleMetrics + ParticipantForm stay in sync on refresh.
+  // Single SOL price source for entire card
   const { priceUsd: solPriceUsd, loading: solPriceLoading, error: solPriceError, refresh: refreshSolPrice } = useSolPrice();
 
   return (
@@ -52,9 +49,9 @@ export const SaleCard: React.FC<SaleCardProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-6">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-purple-400 block mb-1">
-              Private Allocation Sale
+              On-Chain Token Sale
             </span>
-            <h2 className="text-2xl font-extrabold text-white">{token.name} Private Round</h2>
+            <h2 className="text-2xl font-extrabold text-white">{token.name} Public Round</h2>
           </div>
 
           <SaleStatus status={sale.status} />
@@ -87,22 +84,15 @@ export const SaleCard: React.FC<SaleCardProps> = ({
         setBalanceSol={setBalanceSol}
       />
 
-      {/* Registration Form Section */}
-      {/* Show form ONLY when eligible (>= 2 SOL) and sale is not ended */}
-      {eligibilityStatus === 'eligible' && !isEnded && (
-        <ParticipantForm
-          tokenSlug={token.slug}
-          tokenName={token.name}
-          tokenSymbol={token.symbol}
-          tokenPrice={token.sale.tokenPrice}
-          priceCurrency={token.sale.priceCurrency}
-          minimumPurchase={token.sale.minimumPurchase}
-          maximumPurchase={token.sale.maximumPurchase}
+      {/* On-Chain Token Buying Form */}
+      {!isEnded && (
+        <BuyTokenForm
+          token={token}
           balanceSol={balanceSol}
           solPriceUsd={solPriceUsd}
           solPriceLoading={solPriceLoading}
-          onSuccess={onSuccess}
-          onError={onError}
+          refreshBalance={refreshBalance}
+          onPurchaseSuccess={onSuccess}
         />
       )}
 
@@ -111,7 +101,7 @@ export const SaleCard: React.FC<SaleCardProps> = ({
         <div className="rounded-3xl bg-slate-900/60 border border-slate-800 p-6 text-center text-slate-400">
           <Lock className="w-8 h-8 mx-auto mb-2 text-slate-500" />
           <h4 className="text-base font-bold text-white mb-1">Private Sale Ended</h4>
-          <p className="text-xs text-slate-400">Registration for {token.name} is now closed.</p>
+          <p className="text-xs text-slate-400">Sale allocation for {token.name} is now closed.</p>
         </div>
       )}
     </div>

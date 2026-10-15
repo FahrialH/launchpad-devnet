@@ -1,38 +1,33 @@
-export const MINIMUM_SOL_BALANCE = 2;
+export const MINIMUM_SOL_BALANCE = 0.001;
 
-// Primary RPC – set to api.mainnet-beta.solana.com
-// Locked to mainnet per product requirement – do not allow devnet/testnet.
+// Primary RPC configuration
 export const MAINNET_RPC_URL = 'https://api.mainnet-beta.solana.com';
-export const MAINNET_GENESIS_HASH = '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
-export const MAINNET_WS_URL = 'wss://api.mainnet-beta.solana.com';
+export const DEVNET_RPC_URL = 'https://api.devnet.solana.com';
 
-// Public mainnet fallbacks used when the primary RPC returns 403/429 or is blocked.
-// All are mainnet-beta endpoints – never devnet/testnet.
-export const MAINNET_FALLBACK_RPCS: string[] = [
-  'https://solana-rpc.publicnode.com',
-  'https://api.mainnet.solana.com',
-];
+export const MAINNET_GENESIS_HASH = '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
+export const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG';
 
 const envRpc = (import.meta.env.VITE_SOLANA_RPC_URL || '').trim();
-const envNetwork = (import.meta.env.VITE_SOLANA_NETWORK || '').trim();
+const envNetwork = (import.meta.env.VITE_SOLANA_NETWORK || 'devnet').trim();
 
-// Allow VITE_SOLANA_RPC_URL override for any mainnet HTTP(S) URL (e.g. Helius/Alchemy/QuickNode).
-// Block devnet/testnet overrides per product requirement – app is mainnet-only.
-function isDevnetUrl(url: string): boolean {
-  return /devnet|testnet/i.test(url);
-}
+export const IS_DEVNET = envNetwork.toLowerCase() === 'devnet';
 
-if (envRpc && isDevnetUrl(envRpc)) {
-  console.warn(`[Solana] VITE_SOLANA_RPC_URL=${envRpc} looks like devnet/testnet – ignoring, forcing ${MAINNET_RPC_URL}.`);
-}
-if (envNetwork && envNetwork !== 'mainnet-beta' && envNetwork !== 'mainnet') {
-  console.warn(`[Solana] VITE_SOLANA_NETWORK=${envNetwork} ignored – forcing mainnet-beta.`);
-}
+export const DEFAULT_SOLANA_NETWORK = IS_DEVNET ? 'devnet' : 'mainnet-beta';
 
 export const DEFAULT_SOLANA_RPC =
-  envRpc && !isDevnetUrl(envRpc) && /^https?:\/\//.test(envRpc) ? envRpc : MAINNET_RPC_URL;
+  envRpc || (IS_DEVNET ? DEVNET_RPC_URL : MAINNET_RPC_URL);
 
-export const DEFAULT_SOLANA_NETWORK = 'mainnet-beta';
+export const EXPECTED_GENESIS_HASH = IS_DEVNET
+  ? DEVNET_GENESIS_HASH
+  : MAINNET_GENESIS_HASH;
+
+// Public fallbacks
+export const MAINNET_FALLBACK_RPCS: string[] = IS_DEVNET
+  ? ['https://api.devnet.solana.com']
+  : [
+      'https://solana-rpc.publicnode.com',
+      'https://api.mainnet.solana.com',
+    ];
 
 export const SUPABASE_URL = 
   import.meta.env.VITE_SUPABASE_URL || '';

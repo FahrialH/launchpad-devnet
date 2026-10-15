@@ -7,9 +7,7 @@ import { Header } from '../components/Header';
 import { TokenHero } from '../components/TokenHero';
 import { SaleCard } from '../components/SaleCard';
 import { Tokenomics } from '../components/Tokenomics';
-import { SuccessModal } from '../components/SuccessModal';
 import { ErrorAlert } from '../components/ErrorAlert';
-import { RegistrationResponse } from '../types';
 
 export const TokenPage: React.FC = () => {
   const { tokenSlug } = useParams<{ tokenSlug: string }>();
@@ -19,38 +17,13 @@ export const TokenPage: React.FC = () => {
   const { eligibilityStatus } = useEligibility(balanceSol, loadingBalance);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [successData, setSuccessData] = useState<{
-    email: string;
-    telegramId: string;
-    walletAddress: string;
-    fullName: string;
-    commitAmount: number;
-    commitCurrency: string;
-    solBalance: number | null;
-  }>({
-    email: '',
-    telegramId: '',
-    walletAddress: '',
-    fullName: '',
-    commitAmount: 0,
-    commitCurrency: '',
-    solBalance: null,
-  });
 
   if (!token) {
     return <Navigate to="/404" replace />;
   }
 
-  const handleRegistrationSuccess = (
-    _res: RegistrationResponse,
-    formData: { email: string; telegramId: string; walletAddress: string; fullName: string; commitAmount: number; commitCurrency: string }
-  ) => {
-    setSuccessData({
-      ...formData,
-      solBalance: balanceSol,
-    });
-    setSuccessModalOpen(true);
+  const handlePurchaseSuccess = (txSig: string, amount: number) => {
+    refreshBalance();
   };
 
   const handleRegistrationError = (msg: string) => {
@@ -105,7 +78,7 @@ export const TokenPage: React.FC = () => {
               eligibilityStatus={eligibilityStatus}
               refreshBalance={refreshBalance}
               setBalanceSol={setBalanceSol}
-              onSuccess={handleRegistrationSuccess}
+              onSuccess={handlePurchaseSuccess}
               onError={handleRegistrationError}
             />
           </div>
@@ -118,15 +91,6 @@ export const TokenPage: React.FC = () => {
           <p>© 2026 IDOpenTech Launchpad. Built for Solana Ecosystem.</p>
         </div>
       </footer>
-
-      {/* Success Modal */}
-      <SuccessModal
-        isOpen={successModalOpen}
-        onClose={() => setSuccessModalOpen(false)}
-        tokenName={token.name}
-        telegramLink={token.links.telegram}
-        data={successData}
-      />
 
       {/* Error Alert */}
       <ErrorAlert

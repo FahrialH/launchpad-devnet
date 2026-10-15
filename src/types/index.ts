@@ -43,6 +43,8 @@ export interface TokenConfig {
   banner?: string;
   network: string;
   chainId: string;
+  mintAddress?: string;
+  programId?: string;
   sale: SaleConfig;
   tokenomics: TokenomicsConfig;
   links: ProjectLinks;

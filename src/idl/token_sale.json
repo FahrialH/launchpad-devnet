@@ -1,0 +1,493 @@
+{
+  "address": "DVGezEfHU5VwEGekdpc3PnUgUpfX2q6FdisG8hoGdF6c",
+  "metadata": {
+    "name": "token_sale",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Solana fixed-price token sale program built with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize_sale",
+      "discriminator": [
+        208,
+        103,
+        34,
+        154,
+        179,
+        6,
+        125,
+        208
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "sale",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  97,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury"
+        },
+        {
+          "name": "admin_token_account",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "price_lamports_per_whole_token",
+          "type": "u64"
+        },
+        {
+          "name": "token_decimals",
+          "type": "u8"
+        },
+        {
+          "name": "start_ts",
+          "type": "i64"
+        },
+        {
+          "name": "end_ts",
+          "type": "i64"
+        },
+        {
+          "name": "allocation",
+          "type": "u64"
+        },
+        {
+          "name": "per_wallet_max",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "buy",
+      "discriminator": [
+        102,
+        6,
+        61,
+        18,
+        1,
+        218,
+        235,
+        234
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sale",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  97,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sale.mint",
+                "account": "sale"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "buyer_token_account",
+          "writable": true
+        },
+        {
+          "name": "buyer_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  117,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sale"
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "toggle_pause",
+      "discriminator": [
+        238,
+        237,
+        206,
+        218,
+        255,
+        95,
+        123,
+        229
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "sale",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  97,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sale.mint",
+                "account": "sale"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_unsold",
+      "discriminator": [
+        6,
+        159,
+        31,
+        233,
+        165,
+        117,
+        226,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sale",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  97,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sale.mint",
+                "account": "sale"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "admin_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Sale",
+      "discriminator": [
+        202,
+        64,
+        232,
+        171,
+        178,
+        172,
+        34,
+        183
+      ]
+    },
+    {
+      "name": "BuyerStats",
+      "discriminator": [
+        99,
+        111,
+        219,
+        74,
+        172,
+        73,
+        248,
+        140
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Sale",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "price_lamports_per_whole_token",
+            "type": "u64"
+          },
+          {
+            "name": "token_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "start_ts",
+            "type": "i64"
+          },
+          {
+            "name": "end_ts",
+            "type": "i64"
+          },
+          {
+            "name": "allocation",
+            "type": "u64"
+          },
+          {
+            "name": "sold",
+            "type": "u64"
+          },
+          {
+            "name": "per_wallet_max",
+            "type": "u64"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BuyerStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sale",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_purchased",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidPrice",
+      "msg": "Price must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidTimeRange",
+      "msg": "start_ts must be before end_ts"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidAllocation",
+      "msg": "Allocation must be greater than zero"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidPerWalletMax",
+      "msg": "Per-wallet max must be greater than zero"
+    },
+    {
+      "code": 6004,
+      "name": "SaleNotStarted",
+      "msg": "Sale has not started yet"
+    },
+    {
+      "code": 6005,
+      "name": "SaleEnded",
+      "msg": "Sale has ended"
+    },
+    {
+      "code": 6006,
+      "name": "SalePaused",
+      "msg": "Sale is paused"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidTokenAmount",
+      "msg": "token_amount must be a positive multiple of 10^decimals (whole tokens only)"
+    },
+    {
+      "code": 6008,
+      "name": "AllocationExceeded",
+      "msg": "Exceeds total sale allocation"
+    },
+    {
+      "code": 6009,
+      "name": "PerWalletMaxExceeded",
+      "msg": "Exceeds per-wallet purchase limit"
+    },
+    {
+      "code": 6010,
+      "name": "MathOverflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6011,
+      "name": "SaleNotEnded",
+      "msg": "Sale has not ended yet"
+    }
+  ]
+}

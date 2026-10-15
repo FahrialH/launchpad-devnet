@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { WalletButton } from './WalletButton';
 import { Rocket, ShieldCheck } from 'lucide-react';
 
+import { IS_DEVNET } from '../lib/constants';
+
 interface HeaderProps {
   balanceSol: number | null;
   networkName?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ balanceSol, networkName = 'Solana Mainnet' }) => {
+export const Header: React.FC<HeaderProps> = ({ balanceSol, networkName = IS_DEVNET ? 'Solana Devnet' : 'Solana Mainnet' }) => {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#090d16]/80 border-b border-slate-800/60 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">

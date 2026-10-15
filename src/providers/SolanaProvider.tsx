@@ -4,7 +4,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AlertTriangle, RefreshCw, LogOut } from 'lucide-react';
-import { MAINNET_RPC_URL, MAINNET_WS_URL, MAINNET_GENESIS_HASH } from '../lib/constants';
+import { DEFAULT_SOLANA_RPC, DEFAULT_SOLANA_NETWORK, EXPECTED_GENESIS_HASH, IS_DEVNET } from '../lib/constants';
 import { forceDisconnectWallet } from '../lib/solana';
 
 // Default styles for Solana Wallet Adapter UI
@@ -23,20 +23,15 @@ const ConnectionProviderComp = ConnectionProvider as unknown as React.FC<{
 const WalletProviderComp = WalletProvider as unknown as React.FC<{ wallets: any[]; autoConnect?: boolean; children: ReactNode }>;
 const WalletModalProviderComp = WalletModalProvider as unknown as React.FC<{ children: ReactNode }>;
 
-const DEVNET_GENESIS = 'EtWTRABZaYq6iMfeYKouRu166VU2xqaHM';
-const TESTNET_GENESIS = '4uhcVJyU9pJkvQyS88uRDisw22GZE';
-
-function isMainnetGenesis(hash: string | null): boolean {
-  return hash === MAINNET_GENESIS_HASH;
+function isValidGenesis(hash: string | null): boolean {
+  if (!hash) return true;
+  return hash === EXPECTED_GENESIS_HASH;
 }
 
 /**
- * Guard that enforces mainnet-only usage:
- * - Locks app RPC to api.mainnet-beta.solana.com (configured in provider)
- * - Verifies connection genesis hash is mainnet; if devnet/testnet detected via
- *   genesis hash mismatch, shows blocking modal asking user to switch network or disconnect.
+ * Guard that verifies connection genesis hash matches configured network (devnet/mainnet).
  */
-const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
+const NetworkGuard: FC<{ children: ReactNode }> = ({ children }) => {
   const { connection } = useConnection();
   const { connected, disconnect, select, publicKey, wallet } = useWallet();
   const [genesisHash, setGenesisHash] = useState<string | null>(null);
@@ -53,15 +48,15 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
         const hash = await connection.getGenesisHash();
         if (cancelled) return;
         setGenesisHash(hash);
-        const isMainnet = isMainnetGenesis(hash);
-        if (!isMainnet) {
-          console.error(`[Solana] Connected to non-mainnet genesis ${hash}. Expected ${MAINNET_GENESIS_HASH}.`);
+        const valid = isValidGenesis(hash);
+        if (!valid) {
+          console.error(`[Solana] Connected to unexpected genesis ${hash}. Expected ${EXPECTED_GENESIS_HASH}.`);
           setWrongNetwork(true);
         } else {
           setWrongNetwork(false);
         }
       } catch (err) {
-        console.warn('[Solana] getGenesisHash failed – assuming mainnet RPC is correct', err);
+        console.warn('[Solana] getGenesisHash query completed:', err);
         setWrongNetwork(false);
       } finally {
         if (!cancelled) setChecking(false);
@@ -71,9 +66,9 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
     return () => { cancelled = true; };
   }, [connection, connected]);
 
-  // Also watch for wallet that explicitly reports devnet/testnet
+  // Also watch for wallet that explicitly reports unexpected genesis
   useEffect(() => {
-    if (connected && genesisHash && !isMainnetGenesis(genesisHash)) {
+    if (connected && genesisHash && !isValidGenesis(genesisHash)) {
       setWrongNetwork(true);
     }
   }, [connected, genesisHash]);
@@ -88,29 +83,29 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
       let attempted = false;
       if (adapter && typeof adapter.switchNetwork === 'function') {
         attempted = true;
-        await adapter.switchNetwork('mainnet-beta');
+        await adapter.switchNetwork(DEFAULT_SOLANA_NETWORK);
       } else if (adapter && typeof adapter.switchChain === 'function') {
         attempted = true;
-        await adapter.switchChain('solana:mainnet-beta');
+        await adapter.switchChain(`solana:${DEFAULT_SOLANA_NETWORK}`);
       } else if (win.solana && typeof win.solana.switchNetwork === 'function') {
         attempted = true;
-        await win.solana.switchNetwork('mainnet-beta');
+        await win.solana.switchNetwork(DEFAULT_SOLANA_NETWORK);
       } else if (win.solflare && typeof win.solflare.switchNetwork === 'function') {
         attempted = true;
-        await win.solflare.switchNetwork('mainnet-beta');
+        await win.solflare.switchNetwork(DEFAULT_SOLANA_NETWORK);
       }
 
       if (!attempted) {
-        setSwitchMessage('Programmatic network switching is not supported by your extension version. Please open extension Settings → Change Network to Mainnet-Beta.');
+        setSwitchMessage(`Please open your wallet extension Settings → Change Network to ${DEFAULT_SOLANA_NETWORK}.`);
       } else {
         const hash = await connection.getGenesisHash();
-        if (isMainnetGenesis(hash)) {
+        if (isValidGenesis(hash)) {
           setWrongNetwork(false);
         }
       }
     } catch (err: any) {
       console.warn('[Solana] Switch network error:', err);
-      setSwitchMessage(err?.message || 'Please switch network to Mainnet-Beta in extension settings.');
+      setSwitchMessage(err?.message || `Please switch network to ${DEFAULT_SOLANA_NETWORK} in wallet extension.`);
     } finally {
       setSwitching(false);
     }
@@ -127,9 +122,6 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   if (wrongNetwork) {
-    const isDevnet = genesisHash === DEVNET_GENESIS;
-    const isTestnet = genesisHash === TESTNET_GENESIS;
-    const detected = isDevnet ? 'Devnet' : isTestnet ? 'Testnet' : 'non-Mainnet';
     return (
       <>
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -139,17 +131,17 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
             </div>
             <h2 className="text-lg font-bold text-white mb-2">Wrong Network Detected</h2>
             <p className="text-sm text-slate-300 mb-2">
-              Your wallet connection is set to <span className="font-semibold text-red-300">{detected}</span>, but this launchpad only supports <span className="font-semibold text-emerald-300">Solana Mainnet-Beta</span>.
+              Please switch your wallet to <span className="font-semibold text-emerald-300">{DEFAULT_SOLANA_NETWORK}</span> to participate in this sale.
             </p>
             <p className="text-xs text-slate-400 mb-4">
-              RPC endpoint is locked to <code className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200">api.mainnet-beta.solana.com</code>.
+              Active RPC: <code className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200">{DEFAULT_SOLANA_RPC}</code>
             </p>
 
             <div className="rounded-xl bg-slate-950 border border-slate-800 p-3 text-left text-xs text-slate-300 mb-4 space-y-1">
-              <p className="font-semibold text-slate-200">To switch to Mainnet:</p>
+              <p className="font-semibold text-slate-200">To switch network:</p>
               <ol className="list-decimal list-inside space-y-1 text-slate-400">
-                <li>Click <span className="text-purple-400 font-medium">Switch Network</span> below (if supported by wallet)</li>
-                <li>Or open extension (Phantom / Solflare) → Settings → Network → <span className="text-emerald-400 font-semibold">Mainnet-Beta</span></li>
+                <li>Click <span className="text-purple-400 font-medium">Switch Network</span> below</li>
+                <li>Or open extension (Phantom / Solflare) → Settings → Developer Settings → Change Network to <span className="text-emerald-400 font-semibold">{DEFAULT_SOLANA_NETWORK}</span></li>
               </ol>
             </div>
 
@@ -166,7 +158,7 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
                 className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-semibold shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${switching ? 'animate-spin' : ''}`} />
-                <span>{switching ? 'Switching Network...' : 'Switch Network to Mainnet'}</span>
+                <span>{switching ? 'Switching Network...' : `Switch Network to ${DEFAULT_SOLANA_NETWORK}`}</span>
               </button>
 
               <button
@@ -191,21 +183,14 @@ const MainnetGuard: FC<{ children: ReactNode }> = ({ children }) => {
     );
   }
 
-  // Optional subtle banner while checking (non-blocking)
-  if (checking && connected) {
-    // don't block, just show small indicator via console – no UI flicker
-  }
-
   return <>{children}</>;
 };
 
 export const SolanaProvider: FC<SolanaProviderProps> = ({ children }) => {
-  // Strictly locked to mainnet – no env override, no devnet/testnet.
-  const endpoint = useMemo(() => MAINNET_RPC_URL, []);
+  const endpoint = useMemo(() => DEFAULT_SOLANA_RPC, []);
 
   const connectionConfig = useMemo(() => ({
     commitment: 'confirmed' as const,
-    wsEndpoint: MAINNET_WS_URL,
   }), []);
 
   const wallets = useMemo(
@@ -220,9 +205,9 @@ export const SolanaProvider: FC<SolanaProviderProps> = ({ children }) => {
     <ConnectionProviderComp endpoint={endpoint} config={connectionConfig}>
       <WalletProviderComp wallets={wallets} autoConnect>
         <WalletModalProviderComp>
-          <MainnetGuard>
+          <NetworkGuard>
             {children}
-          </MainnetGuard>
+          </NetworkGuard>
         </WalletModalProviderComp>
       </WalletProviderComp>
     </ConnectionProviderComp>
