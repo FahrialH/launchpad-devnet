@@ -22,12 +22,19 @@ export const EXPECTED_GENESIS_HASH = IS_DEVNET
   : MAINNET_GENESIS_HASH;
 
 // Public fallbacks
-export const MAINNET_FALLBACK_RPCS: string[] = IS_DEVNET
-  ? ['https://api.devnet.solana.com']
-  : [
-      'https://solana-rpc.publicnode.com',
-      'https://api.mainnet.solana.com',
-    ];
+export const DEVNET_FALLBACK_RPCS: string[] = [
+  'https://api.devnet.solana.com',
+  'https://rpc.ankr.com/solana_devnet',
+];
+
+export const MAINNET_FALLBACK_RPCS: string[] = [
+  'https://solana-rpc.publicnode.com',
+  'https://api.mainnet.solana.com',
+];
+
+export const FALLBACK_RPCS: string[] = IS_DEVNET
+  ? DEVNET_FALLBACK_RPCS
+  : MAINNET_FALLBACK_RPCS;
 
 export const SUPABASE_URL = 
   import.meta.env.VITE_SUPABASE_URL || '';

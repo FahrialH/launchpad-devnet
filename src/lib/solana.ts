@@ -1,13 +1,10 @@
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { DEFAULT_SOLANA_RPC, MAINNET_RPC_URL, MAINNET_FALLBACK_RPCS } from './constants';
+import { DEFAULT_SOLANA_RPC, FALLBACK_RPCS, MAINNET_FALLBACK_RPCS } from './constants';
 
-// Primary is DEFAULT_SOLANA_RPC (env override or solana-rpc.publicnode.com).
-// Added public mainnet fallbacks for 403/429 recovery.
-
+// Primary is DEFAULT_SOLANA_RPC with network-appropriate fallbacks (devnet vs mainnet)
 export const FALLBACK_RPC_ENDPOINTS = [
   DEFAULT_SOLANA_RPC,
-  ...MAINNET_FALLBACK_RPCS,
-  MAINNET_RPC_URL,
+  ...FALLBACK_RPCS,
 ].filter((url, index, self) => url && self.indexOf(url) === index) as string[];
 
 // Re-export for edge-function parity checks
