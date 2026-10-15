@@ -54,7 +54,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
         </h3>
 
         <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-          You are officially registered for the <span className="font-bold text-white">{tokenName}</span> private sale.
+          You are officially registered for the <span className="font-bold text-white">{tokenName}</span> token sale.
         </p>
 
         <div className="space-y-2.5 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-left text-xs mb-6">

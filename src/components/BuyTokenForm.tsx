@@ -381,27 +381,44 @@ export const BuyTokenForm: React.FC<BuyTokenFormProps> = ({
 
       {/* Success Notification */}
       {txSuccessSig && (
-        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-5 space-y-4 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5 text-emerald-400 font-bold text-base">
             <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-            <span>Tokens Purchased Successfully!</span>
+            <span>Pembelian Berhasil! (Purchase Confirmed)</span>
           </div>
-          <p className="text-xs text-slate-300">
-            {parsedTokens.toLocaleString()} {token.symbol} have been transferred to your wallet token account.
+
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Selamat! Sebanyak <strong className="text-white font-mono">{parsedTokens.toLocaleString()} {token.symbol}</strong> telah berhasil ditransfer ke Associated Token Account (ATA) wallet Anda.
           </p>
-          <div className="flex items-center justify-between pt-2 border-t border-emerald-500/20 text-xs">
-            <span className="text-slate-400 truncate max-w-[200px]">
-              Sig: {txSuccessSig.slice(0, 8)}...{txSuccessSig.slice(-6)}
-            </span>
+
+          <div className="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/20 text-xs font-mono space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Transaction Signature:</span>
+            <div className="text-emerald-300 break-all select-all font-mono text-[11px]">
+              {txSuccessSig}
+            </div>
+          </div>
+
+          <div className="pt-1 flex flex-col sm:flex-row gap-2">
             <a
               href={`https://explorer.solana.com/tx/${txSuccessSig}?cluster=${DEFAULT_SOLANA_NETWORK}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-emerald-400 hover:text-emerald-300 underline"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-emerald-950/30"
             >
-              <span>View Explorer</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-4 h-4" />
+              <span>🔍 Cek Manual di Solana Explorer ↗</span>
             </a>
+
+            {wallet.publicKey && (
+              <a
+                href={`https://explorer.solana.com/address/${wallet.publicKey.toBase58()}?cluster=${DEFAULT_SOLANA_NETWORK}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold text-xs border border-slate-700 transition-colors"
+              >
+                <span>Cek Token di Wallet ↗</span>
+              </a>
+            )}
           </div>
         </div>
       )}

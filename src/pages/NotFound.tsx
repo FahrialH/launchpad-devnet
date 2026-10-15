@@ -14,7 +14,7 @@ export const NotFound: React.FC = () => {
           <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">404 Error</span>
           <h1 className="text-3xl font-black text-white">Token Sale Not Found</h1>
           <p className="text-sm text-slate-400 leading-relaxed">
-            The token private sale URL you visited does not exist or has been removed from our launchpad configuration.
+            The token sale URL you visited does not exist or has been removed from our launchpad configuration.
           </p>
         </div>
 

@@ -2,15 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { WalletButton } from './WalletButton';
 import { Rocket, ShieldCheck } from 'lucide-react';
-
 import { IS_DEVNET } from '../lib/constants';
 
 interface HeaderProps {
   balanceSol: number | null;
+  tokenBalance?: number | null;
+  tokenSymbol?: string;
   networkName?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ balanceSol, networkName = IS_DEVNET ? 'Solana Devnet' : 'Solana Mainnet' }) => {
+export const Header: React.FC<HeaderProps> = ({
+  balanceSol,
+  tokenBalance,
+  tokenSymbol,
+  networkName = IS_DEVNET ? 'Solana Devnet' : 'Solana Mainnet',
+}) => {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#090d16]/80 border-b border-slate-800/60 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -25,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ balanceSol, networkName = IS_DEV
             <div className="flex items-center gap-2">
               <span className="font-bold text-lg text-white tracking-tight">IDOpenTech</span>
               <span className="px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                Private Sale
+                Token Sale
               </span>
             </div>
             <p className="text-xs text-slate-400 hidden sm:block">Solana Verified Token Launchpad</p>
@@ -39,7 +45,11 @@ export const Header: React.FC<HeaderProps> = ({ balanceSol, networkName = IS_DEV
             <span>{networkName}</span>
           </div>
 
-          <WalletButton balanceSol={balanceSol} />
+          <WalletButton
+            balanceSol={balanceSol}
+            tokenBalance={tokenBalance}
+            tokenSymbol={tokenSymbol}
+          />
         </div>
       </div>
     </header>

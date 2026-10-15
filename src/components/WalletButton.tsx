@@ -1,14 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { Wallet, LogOut, Copy, Check, ChevronDown, ExternalLink } from 'lucide-react';
+import { Wallet, LogOut, Copy, Check, ChevronDown, ExternalLink, Coins } from 'lucide-react';
 import { formatAddress, forceDisconnectWallet } from '../lib/solana';
+import { IS_DEVNET } from '../lib/constants';
 
 interface WalletButtonProps {
   balanceSol: number | null;
+  tokenBalance?: number | null;
+  tokenSymbol?: string;
 }
 
-export const WalletButton: React.FC<WalletButtonProps> = ({ balanceSol }) => {
+export const WalletButton: React.FC<WalletButtonProps> = ({
+  balanceSol,
+  tokenBalance,
+  tokenSymbol,
+}) => {
   const { publicKey, connected, disconnect, select, wallet } = useWallet();
   const { setVisible } = useWalletModal();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -60,10 +67,18 @@ export const WalletButton: React.FC<WalletButtonProps> = ({ balanceSol }) => {
         className="inline-flex items-center gap-2 p-1.5 pl-3 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-purple-500/50 text-slate-100 font-medium transition-all shadow-md"
       >
         {/* SOL Balance pill */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-800/40 text-purple-200 text-sm font-semibold">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-200 text-xs sm:text-sm font-semibold">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>{balanceSol !== null ? `${balanceSol.toFixed(2)} SOL` : 'Fetching...'}</span>
         </div>
+
+        {/* Token Balance pill (when available) */}
+        {tokenSymbol && tokenBalance !== null && (
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-950/70 border border-purple-700/50 text-purple-200 text-xs sm:text-sm font-bold shadow-sm">
+            <Coins className="w-3.5 h-3.5 text-purple-400" />
+            <span>{tokenBalance.toLocaleString()} {tokenSymbol}</span>
+          </div>
+        )}
 
         {/* Shortened address */}
         <div className="flex items-center gap-1.5 px-2 text-sm font-mono text-slate-200">
@@ -100,20 +115,34 @@ export const WalletButton: React.FC<WalletButtonProps> = ({ balanceSol }) => {
               </div>
             </div>
 
+            {/* SOL Balance */}
             <div className="flex justify-between items-center py-2 px-3 rounded-xl bg-slate-800/40 border border-slate-800">
               <span className="text-xs text-slate-400">SOL Balance</span>
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-white font-mono">
                 {balanceSol !== null ? `${balanceSol.toFixed(4)} SOL` : 'Loading...'}
               </span>
             </div>
 
+            {/* Purchased Token Balance */}
+            {tokenSymbol && (
+              <div className="flex justify-between items-center py-2 px-3 rounded-xl bg-purple-950/40 border border-purple-800/50">
+                <span className="text-xs text-purple-300 font-medium flex items-center gap-1.5">
+                  <Coins className="w-3.5 h-3.5 text-purple-400" />
+                  <span>{tokenSymbol} Balance</span>
+                </span>
+                <span className="text-sm font-bold text-emerald-400 font-mono">
+                  {tokenBalance !== null ? `${tokenBalance.toLocaleString()} ${tokenSymbol}` : '0 ' + tokenSymbol}
+                </span>
+              </div>
+            )}
+
             <a
-              href={`https://solscan.io/account/${address}`}
+              href={`https://explorer.solana.com/address/${address}?cluster=${IS_DEVNET ? 'devnet' : 'mainnet-beta'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between text-xs text-purple-400 hover:text-purple-300 py-1 transition-colors"
             >
-              <span>View on Solscan</span>
+              <span>View on Solana Explorer</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
 

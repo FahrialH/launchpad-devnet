@@ -141,7 +141,7 @@ export const ParticipantForm: React.FC<ParticipantFormProps> = ({
     <form onSubmit={handleSubmit} className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
       <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
         <div>
-          <h3 className="text-xl font-bold text-white">Join {tokenName} Private Sale</h3>
+          <h3 className="text-xl font-bold text-white">Join {tokenName} Token Sale</h3>
           <p className="text-xs text-slate-400 mt-0.5">Submit your verified whitelist participation details</p>
         </div>
         <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
@@ -343,7 +343,7 @@ export const ParticipantForm: React.FC<ParticipantFormProps> = ({
             </>
           ) : (
             <>
-              <span>Join Private Sale</span>
+              <span>Join Token Sale</span>
               <ArrowRight className="w-5 h-5" />
             </>
           )}

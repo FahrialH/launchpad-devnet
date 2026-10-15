@@ -37,7 +37,7 @@ export const EligibilityCard: React.FC<EligibilityCardProps> = ({
         </div>
         <h3 className="text-xl font-bold text-white mb-2">Check Sale Eligibility</h3>
         <p className="text-sm text-slate-400 max-w-sm mx-auto mb-6">
-          Connect your Solana wallet to verify your SOL balance and qualify for the private sale whitelist.
+          Connect your Solana wallet to verify your SOL balance and qualify for the token sale.
         </p>
 
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-400 mb-6">
@@ -122,7 +122,7 @@ export const EligibilityCard: React.FC<EligibilityCardProps> = ({
         </div>
 
         <p className="text-xs text-red-300 text-center mb-5 leading-relaxed bg-red-500/10 p-3 rounded-xl border border-red-500/20">
-          You need at least {MINIMUM_SOL_BALANCE} SOL in your connected wallet to join this private sale.
+          You need at least {MINIMUM_SOL_BALANCE} SOL in your connected wallet to join this token sale.
         </p>
 
         {/* Demo/Testing Helper for reviewers without mainnet SOL */}

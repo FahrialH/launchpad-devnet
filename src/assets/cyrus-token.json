@@ -1,0 +1,34 @@
+{
+  "name": "CYRUS",
+  "symbol": "CRS",
+  "description": "CYRUS is a blockchain-based token within the ID-OPENTECH ecosystem, connecting movement, energy generation, and Web3 rewards.",
+  "image": "https://cyruslab.io/assets/crs-token.png",
+  "external_url": "https://cyruslab.io",
+  "attributes": [
+    {
+      "trait_type": "Blockchain",
+      "value": "Solana"
+    },
+    {
+      "trait_type": "Ecosystem",
+      "value": "ID-OPENTECH"
+    },
+    {
+      "trait_type": "Token Type",
+      "value": "Utility"
+    },
+    {
+      "trait_type": "Total Supply",
+      "value": "3000000000"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyruslab.io/assets/crs-token.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

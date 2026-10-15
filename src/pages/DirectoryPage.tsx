@@ -11,7 +11,7 @@ export const DirectoryPage: React.FC = () => {
   const { balanceSol } = useWalletBalance();
 
   useEffect(() => {
-    document.title = 'IDOpenTech Launchpad | Verified Solana Private Sales';
+    document.title = 'IDOpenTech Launchpad | Verified Solana Token Sales';
   }, []);
 
   return (
@@ -26,13 +26,13 @@ export const DirectoryPage: React.FC = () => {
           <div className="relative z-10 max-w-2xl">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 mb-4">
               <Rocket className="w-3.5 h-3.5" />
-              Solana Private Sale Launchpad
+              Solana Token Launchpad
             </span>
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 leading-tight">
               Discover Next-Gen Solana Tokens
             </h1>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
-              Participate in exclusive verified Solana token private sales. Connect your wallet, verify your SOL balance (≥ 2 SOL), and join whitelist allocations.
+              Participate in exclusive verified Solana token sales. Connect your wallet and purchase tokens directly on-chain.
             </p>
           </div>
         </div>

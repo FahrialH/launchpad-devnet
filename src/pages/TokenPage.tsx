@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useToken } from '../hooks/useToken';
 import { useWalletBalance } from '../hooks/useWalletBalance';
-import { useEligibility } from '../hooks/useEligibility';
+import { useTokenBalance } from '../hooks/useTokenBalance';
 import { Header } from '../components/Header';
 import { TokenHero } from '../components/TokenHero';
 import { SaleCard } from '../components/SaleCard';
@@ -13,8 +13,8 @@ export const TokenPage: React.FC = () => {
   const { tokenSlug } = useParams<{ tokenSlug: string }>();
   const { token } = useToken(tokenSlug);
 
-  const { balanceSol, loading: loadingBalance, error: balanceError, refreshBalance, setBalanceSol } = useWalletBalance();
-  const { eligibilityStatus } = useEligibility(balanceSol, loadingBalance);
+  const { balanceSol, refreshBalance } = useWalletBalance();
+  const { tokenBalance, refreshTokenBalance } = useTokenBalance(token?.mintAddress);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -22,23 +22,32 @@ export const TokenPage: React.FC = () => {
     return <Navigate to="/404" replace />;
   }
 
-  const handlePurchaseSuccess = (txSig: string, amount: number) => {
+  const handlePurchaseSuccess = (_txSig: string, _amount: number) => {
+    // Refresh both SOL balance and token ATA balance
     refreshBalance();
-  };
+    refreshTokenBalance();
 
-  const handleRegistrationError = (msg: string) => {
-    setErrorMessage(msg);
+    // Secondary poll after 1.5s to ensure Solana RPC has confirmed the state
+    setTimeout(() => {
+      refreshBalance();
+      refreshTokenBalance();
+    }, 1500);
   };
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-purple-500 selection:text-white">
-      <Header balanceSol={balanceSol} networkName={`${token.network} ${token.chainId}`} />
+      <Header
+        balanceSol={balanceSol}
+        tokenBalance={tokenBalance}
+        tokenSymbol={token.symbol}
+        networkName={`${token.network} ${token.chainId}`}
+      />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Token Hero Banner */}
         <TokenHero token={token} />
 
-        {/* Desktop 2-column layout (Left: Project & Tokenomics, Right: Sale & Registration) */}
+        {/* Desktop 2-column layout (Left: Project & Tokenomics, Right: Side panel buying form) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Project Overview & Tokenomics */}
           <div className="lg:col-span-7 space-y-8 order-2 lg:order-1">
@@ -61,25 +70,23 @@ export const TokenPage: React.FC = () => {
                   <span className="text-purple-300 font-semibold">{token.sale.type}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block font-medium">Min Balance</span>
-                  <span className="text-emerald-400 font-bold font-mono">2 SOL</span>
+                  <span className="text-slate-500 block font-medium">Min Purchase</span>
+                  <span className="text-emerald-400 font-bold font-mono">
+                    {token.sale.minimumPurchase || '1 ' + token.symbol}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Sale Status, Eligibility & Form */}
+          {/* Right Column: Side panel (Purely On-Chain Buying Form) */}
           <div className="lg:col-span-5 order-1 lg:order-2">
             <SaleCard
               token={token}
               balanceSol={balanceSol}
-              loadingBalance={loadingBalance}
-              balanceError={balanceError}
-              eligibilityStatus={eligibilityStatus}
               refreshBalance={refreshBalance}
-              setBalanceSol={setBalanceSol}
               onSuccess={handlePurchaseSuccess}
-              onError={handleRegistrationError}
+              onError={(msg) => setErrorMessage(msg)}
             />
           </div>
         </div>

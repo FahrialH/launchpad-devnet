@@ -1,0 +1,34 @@
+{
+  "name": "INTYFE",
+  "symbol": "INTYFE",
+  "description": "INTYFE is an IP tokenization platform within the ID-OPENTECH ecosystem, connecting film, music, art, and creative projects with blockchain technology. The platform aims to make intellectual property easier to track, develop, and connect with a global Web3 community.",
+  "image": "https://example.com/intyfe-token.png",
+  "external_url": "https://example.com",
+  "attributes": [
+    {
+      "trait_type": "Blockchain",
+      "value": "Solana"
+    },
+    {
+      "trait_type": "Ecosystem",
+      "value": "ID-OPENTECH"
+    },
+    {
+      "trait_type": "Project",
+      "value": "INTYFE"
+    },
+    {
+      "trait_type": "Industry",
+      "value": "IP Tokenization"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://example.com/intyfe-token.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}
