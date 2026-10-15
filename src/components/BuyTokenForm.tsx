@@ -73,11 +73,14 @@ export const BuyTokenForm: React.FC<BuyTokenFormProps> = ({
   const programPubkey = useMemo(() => new PublicKey(programIdStr), [programIdStr]);
 
   const [salePda] = useMemo(() => {
+    if (token.salePda) {
+      return [new PublicKey(token.salePda), 255];
+    }
     return PublicKey.findProgramAddressSync(
       [Buffer.from('sale'), mintPubkey.toBuffer()],
       programPubkey
     );
-  }, [mintPubkey, programPubkey]);
+  }, [token.salePda, mintPubkey, programPubkey]);
 
   // Load Anchor Program
   const program = useMemo(() => {
@@ -143,17 +146,24 @@ export const BuyTokenForm: React.FC<BuyTokenFormProps> = ({
       }
     } catch (err: any) {
       console.error('Error fetching on-chain sale state:', err);
-      // Fallback: use JSON defaults if RPC query stalls
+      // Fallback: derive from token configuration
+      const allocClean = parseFloat((token.sale.allocation || '500000').replace(/[^0-9.]/g, '')) || 500000;
+      const maxClean = parseFloat((token.sale.maximumPurchase || '10000').replace(/[^0-9.]/g, '')) || 10000;
+      const priceLamports = Math.round((token.sale.tokenPrice || 0.001) * LAMPORTS_PER_SOL);
+      const fallbackTreasury = token.treasuryAddress
+        ? new PublicKey(token.treasuryAddress)
+        : new PublicKey('A7dsZyqVQWuX72juKW6qD1PyPoNDo4FWWm9boqpYczt9');
+
       setSaleState({
-        treasury: new PublicKey('A7dsZyqVQWuX72juKW6qD1PyPoNDo4FWWm9boqpYczt9'),
-        priceLamportsPerWholeToken: 1000000, // 0.001 SOL
+        treasury: fallbackTreasury,
+        priceLamportsPerWholeToken: priceLamports,
         tokenDecimals: 9,
-        allocation: 500000,
-        sold: 10,
-        perWalletMax: 10000,
+        allocation: allocClean,
+        sold: 0,
+        perWalletMax: maxClean,
         paused: false,
-        startTs: Math.floor(Date.now() / 1000) - 3600,
-        endTs: Math.floor(Date.now() / 1000) + 86400 * 30,
+        startTs: Math.floor(new Date(token.sale.startAt || Date.now()).getTime() / 1000),
+        endTs: Math.floor(new Date(token.sale.endAt || Date.now() + 86400 * 7).getTime() / 1000),
       });
     } finally {
       setFetchingState(false);
@@ -253,7 +263,9 @@ export const BuyTokenForm: React.FC<BuyTokenFormProps> = ({
 
     try {
       // 1. Derive required accounts
-      const vaultAta = getAssociatedTokenAddressSync(mintPubkey, salePda, true);
+      const vaultAta = token.vaultAddress
+        ? new PublicKey(token.vaultAddress)
+        : getAssociatedTokenAddressSync(mintPubkey, salePda, true);
       const buyerAta = getAssociatedTokenAddressSync(mintPubkey, wallet.publicKey);
       const [buyerStatsPda] = PublicKey.findProgramAddressSync(
         [Buffer.from('buyer'), salePda.toBuffer(), wallet.publicKey.toBuffer()],

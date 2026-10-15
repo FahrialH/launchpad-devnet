@@ -45,6 +45,9 @@ export interface TokenConfig {
   chainId: string;
   mintAddress?: string;
   programId?: string;
+  salePda?: string;
+  vaultAddress?: string;
+  treasuryAddress?: string;
   sale: SaleConfig;
   tokenomics: TokenomicsConfig;
   links: ProjectLinks;
